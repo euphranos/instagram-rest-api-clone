@@ -4,7 +4,7 @@ const userController = require("../controller/userController");
 const commentController = require("../controller/commentController");
 const postController = require("../controller/postController");
 
-//user crud routeları
+// user routes
 userRouter
   .route("/")
   .get(userController.getAllUsers)
@@ -16,7 +16,7 @@ userRouter
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
 
-//usera ait olan postlar için crud routeları
+//post routes
 
 userRouter.route("/:userId/posts/:postId").get(postController.getPost);
 
@@ -25,7 +25,7 @@ userRouter
   .post(postController.createPost)
   .get(postController.getPosts);
 
-//usera ait olan postlara ait olan commentler için crud routeları
+// comment routes
 userRouter
   .route("/:userId/posts/:postId/comments")
   .post(commentController.createComment)

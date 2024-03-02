@@ -1,8 +1,5 @@
 const User = require("../models/userModel");
 
-//controller tamamlandı
-
-//get all users
 exports.getAllUsers = async (req, res) => {
   const users = await User.find();
 
@@ -30,7 +27,6 @@ exports.createUser = async (req, res) => {
     const user = await User.create({ email, name, password, posts });
     res.status(201).json({ status: "success", message: user });
   } catch (err) {
-    // Eğer hata unique alan hatası ise ve özel bir mesaj içeriyorsa, bu mesajı kullan
     if (err.code === 11000 && err.keyPattern && err.keyPattern.email) {
       return res.status(400).json({
         status: "error",
@@ -89,8 +85,6 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ status: "error", message: err });
   }
 };
-
-//delete user
 
 exports.deleteUser = async (req, res) => {
   const id = req.params.id;

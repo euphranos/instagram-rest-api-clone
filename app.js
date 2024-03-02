@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const connectDatabase = require("./config/dbConnection");
 const userRouter = require("./routes/userRouter");
 
-const PORT = process.env.PORT || 3000; // PORT değişkenini tanımla
+const PORT = process.env.PORT || 3000;
 
 app.use(morgan("dev"));
 app.use(express.json());

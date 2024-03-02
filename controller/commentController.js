@@ -1,12 +1,8 @@
 const Comment = require("../models/commentModel");
 const Post = require("../models/postModel");
 
-//comment oluşturmak için create
-//buraya ulaşmak için users/:userId/posts/:postId/comments/
-
 exports.createComment = async (req, res) => {
   const { commentText, ownerPost, ownerUser } = req.body;
-  //böyle bir post un olup olmadığını postId ile kontrol et
   const postId = req.params.postId;
 
   const post = await Post.findById(postId);
@@ -22,7 +18,6 @@ exports.createComment = async (req, res) => {
   }
   try {
     const comment = await Comment.create({ commentText, ownerPost, ownerUser });
-    //burada bu comment._id değerini post içindeki listeye pushlamamız gerek
     await Post.findByIdAndUpdate(
       postId,
       {
@@ -40,9 +35,6 @@ exports.createComment = async (req, res) => {
   //
 };
 
-//post a ait olan commentleri getirmek için bir get
-//buraya ulaşmak için users/:userId/posts/:postId/comments/
-
 exports.getComments = async (req, res) => {
   const postId = req.params.postId;
   if (!postId) {
@@ -51,9 +43,6 @@ exports.getComments = async (req, res) => {
   const comments = await Post.findById(postId).populate("comments");
   res.status(200).json({ status: "success", message: comments.comments });
 };
-
-//post a ait olan spesifik bir commenti getirmek için  bir get
-//buraya ulaşmak için users/:userId/posts/:postId/comments/:commentId
 
 exports.getComment = async (req, res) => {
   const commentId = req.params.commentId;
