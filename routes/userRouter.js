@@ -3,6 +3,7 @@ const userRouter = express.Router();
 const userController = require("../controller/userController");
 const commentController = require("../controller/commentController");
 const postController = require("../controller/postController");
+const authController = require("../controller/authController");
 
 // user routes
 userRouter
@@ -34,5 +35,9 @@ userRouter
 userRouter
   .route("/:userId/posts/:postId/comments/:commentId")
   .get(commentController.getComment);
+
+//auth routes
+
+userRouter.route("/signin").post(authController.singUser);
 
 module.exports = userRouter;
