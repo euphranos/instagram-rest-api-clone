@@ -1,4 +1,11 @@
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
+
+const signToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
 exports.singUser = async (req, res) => {
   const { email, name, password, passwordConfirm, posts } = req.body;
@@ -20,8 +27,34 @@ exports.singUser = async (req, res) => {
         .status(500)
         .json({ status: "error", message: "Internal server error" });
     }
-    res.status(201).json({ status: "success", message: user });
+    const token = signToken(user._id);
+    res.status(201).json({
+      status: "success",
+      token,
+      data: {
+        user: user,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ status: "error", message: error });
   }
+};
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "Please provide email or password" });
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    return res
+      .status(401)
+      .json({ status: "error", message: "Incorrect email or password" });
+  }
+  const token = signToken(user._id);
+  res.status(200).json({ status: "success", token, message: user });
 };
