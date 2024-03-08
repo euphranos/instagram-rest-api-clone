@@ -58,3 +58,27 @@ exports.loginUser = async (req, res) => {
   const token = signToken(user._id);
   res.status(200).json({ status: "success", token, message: user });
 };
+
+exports.protect = async (req, res, next) => {
+  let token;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    return res.status(401).json({
+      status: "error",
+      message: "You are not logged in ! Please log in to get access!",
+    });
+  }
+  try {
+    const decode = await jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(401).json({ status: "error", message: error });
+  }
+
+  next();
+};
+1;

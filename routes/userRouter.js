@@ -3,36 +3,39 @@ const userRouter = express.Router();
 const userController = require("../controller/userController");
 const commentController = require("../controller/commentController");
 const postController = require("../controller/postController");
+const authController = require("../controller/authController");
 
 // user routes
 userRouter
   .route("/")
-  .get(userController.getAllUsers)
-  .post(userController.createUser);
+  .get(authController.protect, userController.getAllUsers)
+  .post(authController.protect, userController.createUser);
 
 userRouter
   .route("/:userId")
-  .get(userController.getUser)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .get(authController.protect, userController.getUser)
+  .patch(authController.protect, userController.updateUser)
+  .delete(authController.protect, userController.deleteUser);
 
 //post routes
 
-userRouter.route("/:userId/posts/:postId").get(postController.getPost);
+userRouter
+  .route("/:userId/posts/:postId")
+  .get(authController.protect, postController.getPost);
 
 userRouter
   .route("/:userId/posts")
-  .post(postController.createPost)
-  .get(postController.getPosts);
+  .post(authController.protect, postController.createPost)
+  .get(authController.protect, postController.getPosts);
 
 // comment routes
 userRouter
   .route("/:userId/posts/:postId/comments")
-  .post(commentController.createComment)
-  .get(commentController.getComments);
+  .post(authController.protect, commentController.createComment)
+  .get(authController.protect, commentController.getComments);
 
 userRouter
   .route("/:userId/posts/:postId/comments/:commentId")
-  .get(commentController.getComment);
+  .get(authController.protect, commentController.getComment);
 
 module.exports = userRouter;
