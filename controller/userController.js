@@ -43,12 +43,11 @@ exports.createUser = async (req, res) => {
 
 //get specific user
 exports.getUser = async (req, res) => {
-  const id = req.params.id;
-
+  const id = req.params.userId;
   if (!id) {
     return res
       .status(404)
-      .json({ status: "error", message: "User doesnt exist" });
+      .json({ status: "error", message: "User doesn't exist" });
   }
   try {
     const user = await User.findById(id);
@@ -87,7 +86,7 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUser = async (req, res) => {
-  const id = req.params.id;
+  const id = req.params.userId;
   if (!id) {
     return res.status(404).json({ status: "error" });
   }
@@ -96,7 +95,7 @@ exports.deleteUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ status: "error" });
     }
-    await User.findOneAndDelete(id);
+    await User.findOneAndDelete(user);
     res.status(200).json({ status: "success", message: "User deleted" });
   } catch (err) {
     res.status(500).json({ status: "error", message: err });

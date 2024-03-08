@@ -75,6 +75,14 @@ exports.protect = async (req, res, next) => {
   }
   try {
     const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decode.id);
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Token is valid but user doesn't exist in database",
+      });
+    }
   } catch (error) {
     return res.status(401).json({ status: "error", message: error });
   }
