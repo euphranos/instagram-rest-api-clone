@@ -89,4 +89,3 @@ exports.protect = async (req, res, next) => {
 
   next();
 };
-1;

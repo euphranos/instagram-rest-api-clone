@@ -31,6 +31,7 @@ const userSchema = mongoose.Schema({
     },
     select: false,
   },
+  passwordChangedAt: Date,
 
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
 });
@@ -41,6 +42,13 @@ userSchema.pre("save", async function (next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    console.log(this.passwordChangedAt, JWTTimestamp);
+  }
+  return false;
+};
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,
