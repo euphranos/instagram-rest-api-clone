@@ -59,6 +59,24 @@ exports.loginUser = async (req, res) => {
   res.status(200).json({ status: "success", token, message: user });
 };
 
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  //we will check this email  in the database and then send a reset link to
+
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "No user with this email" });
+  }
+  // generate a random string for token
+  const resetToken = user.getPasswordResetToken();
+
+  user.save({ validateBeforeSave: false });
+
+  res.status(200).json({ status: "success", message: resetToken });
+};
+
 exports.protect = async (req, res, next) => {
   let token;
   if (
@@ -75,12 +93,20 @@ exports.protect = async (req, res, next) => {
   }
   try {
     const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    //Check if user still exists
     const user = await User.findById(decode.id);
-    console.log(user);
+
     if (!user) {
       return res.status(404).json({
         status: "error",
         message: "Token is valid but user doesn't exist in database",
+      });
+    }
+    //Check if user changed password after the token was issued
+    if (user.changedPasswordAfter(decode.iat)) {
+      return res.status(401).json({
+        status: "error",
+        message: "User recently changed password! Please log in again.",
       });
     }
   } catch (error) {

@@ -59,8 +59,8 @@ exports.getUser = async (req, res) => {
 //update user
 
 exports.updateUser = async (req, res) => {
-  const id = req.params.id;
-  const { name, password } = req.body;
+  const id = req.params.userId;
+  const { name, password, passwordChangedAt } = req.body;
   if (!id) {
     return res
       .status(404)
@@ -69,7 +69,7 @@ exports.updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { name, password },
+      { name, password, passwordChangedAt },
       {
         new: true,
       }

@@ -6,5 +6,6 @@ const authController = require("../controller/authController");
 
 authRouter.route("/signin").post(authController.singUser);
 authRouter.route("/login").post(authController.loginUser);
+authRouter.route("/forgotPassword").post(authController.forgotPassword);
 
 module.exports = authRouter;
