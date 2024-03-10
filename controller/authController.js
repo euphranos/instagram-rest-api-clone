@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -71,10 +72,27 @@ exports.forgotPassword = async (req, res) => {
   }
   // generate a random string for token
   const resetToken = user.getPasswordResetToken();
-
   user.save({ validateBeforeSave: false });
 
-  res.status(200).json({ status: "success", message: resetToken });
+  //send it to user's email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/resetPassword/${resetToken}`;
+
+  const message = `If you requested this password reset, simply click the link below to choose a new, secure password.${resetURL} `;
+
+  await sendEmail({
+    email: user.email,
+    subject: "Your password token (valid for 10 minutes)",
+    message: message,
+  });
+
+  res.status(200).json({ status: "success", message: message });
+};
+
+exports.resetPassword = async (req, res) => {
+  const { newPassword, newPasswordConfirm } = req.body;
+  const resetToken = req.params.token;
 };
 
 exports.protect = async (req, res, next) => {
