@@ -8,11 +8,6 @@ const CommentSchema = new mongoose.Schema(
       required: true,
       ref: "Post",
     },
-    ownerUser: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
   },
   {
     timeStamps: true,

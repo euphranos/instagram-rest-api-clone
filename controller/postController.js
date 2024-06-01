@@ -12,7 +12,7 @@ exports.getPosts = async (req, res) => {
       .status(404)
       .json({ status: "error", message: "User doesnt have posts" });
   }
-  res.status(200).json({ status: "success", message: posts });
+  res.status(200).json({ status: "success", message: posts.posts });
 };
 
 exports.createPost = async (req, res) => {
