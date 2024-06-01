@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -59,6 +60,41 @@ exports.loginUser = async (req, res) => {
   res.status(200).json({ status: "success", token, message: user });
 };
 
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  //we will check this email  in the database and then send a reset link to
+
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    return res
+      .status(404)
+      .json({ status: "error", message: "No user with this email" });
+  }
+  // generate a random string for token
+  const resetToken = user.getPasswordResetToken();
+  user.save({ validateBeforeSave: false });
+
+  //send it to user's email
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/resetPassword/${resetToken}`;
+
+  const message = `If you requested this password reset, simply click the link below to choose a new, secure password.${resetURL} `;
+
+  await sendEmail({
+    email: user.email,
+    subject: "Your password token (valid for 10 minutes)",
+    message: message,
+  });
+
+  res.status(200).json({ status: "success", message: message });
+};
+
+exports.resetPassword = async (req, res) => {
+  const { newPassword, newPasswordConfirm } = req.body;
+  const resetToken = req.params.token;
+};
+
 exports.protect = async (req, res, next) => {
   let token;
   if (
@@ -75,12 +111,20 @@ exports.protect = async (req, res, next) => {
   }
   try {
     const decode = await jwt.verify(token, process.env.JWT_SECRET);
+    //Check if user still exists
     const user = await User.findById(decode.id);
-    console.log(user);
+
     if (!user) {
       return res.status(404).json({
         status: "error",
         message: "Token is valid but user doesn't exist in database",
+      });
+    }
+    //Check if user changed password after the token was issued
+    if (user.changedPasswordAfter(decode.iat)) {
+      return res.status(401).json({
+        status: "error",
+        message: "User recently changed password! Please log in again.",
       });
     }
   } catch (error) {

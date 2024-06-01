@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const { reset } = require("nodemon");
 
 const userSchema = mongoose.Schema({
   email: {
@@ -32,6 +34,8 @@ const userSchema = mongoose.Schema({
     select: false,
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
 });
